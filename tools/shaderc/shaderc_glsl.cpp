@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "shaderc.h"
@@ -74,6 +74,9 @@ namespace bgfx { namespace glsl
 		{
 			char* code = const_cast<char*>(optimizedShader);
 			strReplace(code, "gl_FragDepthEXT", "gl_FragDepth");
+
+			strReplace(code, "textureLodEXT", "texture2DLod");
+			strReplace(code, "textureGradEXT", "texture2DGrad");
 
 			strReplace(code, "texture2DLodARB", "texture2DLod");
 			strReplace(code, "texture2DLodEXT", "texture2DLod");
@@ -204,6 +207,18 @@ namespace bgfx { namespace glsl
 						un.num = num;
 						un.regIndex = 0;
 						un.regCount = num;
+						switch (un.type)
+						{
+						case UniformType::Mat3:
+							un.regCount *= 3;
+							break;
+						case UniformType::Mat4:
+							un.regCount *= 4;
+							break;
+						default:
+							break;
+						}
+
 						uniforms.push_back(un);
 					}
 

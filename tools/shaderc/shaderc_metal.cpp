@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "shaderc.h"
@@ -138,6 +138,15 @@ namespace bgfx { namespace metal
 		0,     // maxTaskWorkGroupSizeY_NV
 		0,     // maxTaskWorkGroupSizeZ_NV
 		0,     // maxMeshViewCountNV
+		0,     // maxMeshOutputVerticesEXT
+		0,     // maxMeshOutputPrimitivesEXT
+		0,     // maxMeshWorkGroupSizeX_EXT
+		0,     // maxMeshWorkGroupSizeY_EXT
+		0,     // maxMeshWorkGroupSizeZ_EXT
+		0,     // maxTaskWorkGroupSizeX_EXT
+		0,     // maxTaskWorkGroupSizeY_EXT
+		0,     // maxTaskWorkGroupSizeZ_EXT
+		0,     // maxMeshViewCountEXT
 		0,     // maxDualSourceDrawBuffersEXT
 
 		{ // limits
@@ -437,6 +446,11 @@ namespace bgfx { namespace metal
 					{
 						Uniform un;
 						un.name = program->getUniformName(ii);
+
+						if (bx::hasSuffix(un.name.c_str(), ".@data") )
+						{
+							continue;
+						}
 
 						un.num = uint8_t(program->getUniformArraySize(ii) );
 						const uint32_t offset = program->getUniformBufferOffset(ii);
