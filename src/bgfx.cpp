@@ -310,6 +310,10 @@ namespace bgfx
 	InternalData g_internalData;
 	PlatformData g_platformData;
 	bool g_platformDataChangedSinceReset = false;
+	std::atomic<bool> g_hackDelayFlip(false);
+	std::atomic<bool> g_hackSuspend(false);
+	std::atomic<bool> g_hackSuspendFinished(false);
+	std::atomic<bool> g_hackResume(false);
 
 	const char* getTypeName(Handle _handle)
 	{
@@ -2289,6 +2293,9 @@ namespace bgfx
 
 	uint32_t Context::frame(bool _capture)
 	{
+      if (bgfx::g_hackSuspendFinished || bgfx::g_hackSuspend)
+         return 0;
+
 		m_encoder[0].end(true);
 
 #if BGFX_CONFIG_MULTITHREADED
@@ -2303,7 +2310,7 @@ namespace bgfx
 		m_submit->m_capture = _capture;
 
 		BGFX_PROFILER_SCOPE("bgfx/API thread frame", 0xff2040ff);
-		// wait for render thread to finish
+
 		renderSemWait();
 		frameNoRenderWait();
 
@@ -2426,10 +2433,31 @@ namespace bgfx
 		if (!m_flipAfterRender)
 		{
 			BGFX_PROFILER_SCOPE("bgfx/flip", 0xff2040ff);
+
 			flip();
+
+#ifdef _GAMING_XBOX
+         if (m_rendererInitialized)
+         {
+            if (bgfx::g_hackSuspend)
+            {
+               m_renderCtx->suspendHack();
+               bgfx::g_hackSuspendFinished = true;
+               while (!bgfx::g_hackResume)
+                  bx::sleep(10);
+               m_renderCtx->resumeHack();
+            }
+         }
+#endif
+         if (bgfx::g_hackResume)
+         {
+            bgfx::g_hackResume = false;
+            bgfx::g_hackSuspendFinished = false;
+         }
+
 		}
 
-		if (apiSemWait(_msecs) )
+		if (apiSemWait(_msecs))
 		{
 			{
 				BGFX_PROFILER_SCOPE("bgfx/Exec commands pre", 0xff2040ff);
@@ -2471,6 +2499,7 @@ namespace bgfx
 		{
 			return RenderFrame::Timeout;
 		}
+
 
 		return m_exit
 			? RenderFrame::Exiting

@@ -2906,6 +2906,8 @@ namespace bgfx { namespace mtl
 	{
 		const uint32_t bpp       = bimg::getBitsPerPixel(bimg::TextureFormat::Enum(m_textureFormat) );
 		uint32_t rectpitch  = _rect.m_width*bpp/8;
+        uint16_t width = _rect.m_width;
+        uint16_t height = _rect.m_height;
 		if (bimg::isCompressed(bimg::TextureFormat::Enum(m_textureFormat)))
 		{
 			if (m_ptr.pixelFormat() >= 160 /*PVRTC_RGB_2BPP*/
@@ -2916,7 +2918,12 @@ namespace bgfx { namespace mtl
 			else
 			{
 				const bimg::ImageBlockInfo& blockInfo = bimg::getBlockInfo(bimg::TextureFormat::Enum(m_textureFormat));
-				rectpitch = (_rect.m_width / blockInfo.blockWidth)*blockInfo.blockSize;
+
+                width = bx::max<uint16_t>(blockInfo.blockWidth  * blockInfo.minBlockX, ( (_rect.m_width  + blockInfo.blockWidth  - 1) / blockInfo.blockWidth)*blockInfo.blockWidth);
+                
+                height = bx::max<uint16_t>(blockInfo.blockHeight  * blockInfo.minBlockY, ( (_rect.m_height  + blockInfo.blockHeight  - 1) / blockInfo.blockHeight)*blockInfo.blockHeight);
+                
+				rectpitch = (width / blockInfo.blockWidth)*blockInfo.blockSize;
 			}
 		}
 		const uint32_t srcpitch  = UINT16_MAX == _pitch ? rectpitch : _pitch;
@@ -2984,10 +2991,10 @@ namespace bgfx { namespace mtl
 			MTLRegion region =
 			{
 				{ 0,     0,      0     },
-				{ _rect.m_width, _rect.m_height, _depth },
+				{ width, height, _depth },
 			};
-			tempTexture.replaceRegion(region, 0, 0, data, srcpitch, srcpitch * _rect.m_height);
-			bce.copyFromTexture(tempTexture, 0, 0,  MTLOriginMake(0,0,0), MTLSizeMake(_rect.m_width, _rect.m_height, _depth),
+			tempTexture.replaceRegion(region, 0, 0, data, srcpitch, srcpitch * height);
+			bce.copyFromTexture(tempTexture, 0, 0,  MTLOriginMake(0,0,0), MTLSizeMake(width, height, _depth),
 								m_ptr, slice, _mip, MTLOriginMake(_rect.m_x, _rect.m_y, zz));
 			release(tempTexture);
 		}

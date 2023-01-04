@@ -9,6 +9,7 @@
 #include <stdarg.h> // va_list
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // NULL
+#include <atomic>
 
 #include "defines.h"
 
@@ -24,6 +25,15 @@ namespace bx { struct AllocatorI; }
 /// BGFX
 namespace bgfx
 {
+ 
+	extern std::atomic<bool>  g_hackDelayFlip;
+	extern std::atomic<bool>  g_hackSuspend;
+	extern std::atomic<bool>  g_hackSuspendFinished;
+	extern std::atomic<bool>  g_hackResume;
+
+	void suspendHack();
+	void resumeHack();
+
 	/// Fatal error enum.
 	///
 	/// @attention C99 equivalent is `bgfx_fatal_t`.

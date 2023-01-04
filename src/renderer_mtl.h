@@ -92,7 +92,7 @@ namespace bgfx { namespace mtl
 			, MTLOrigin _destinationOrigin
 			)
 		{
-			[m_obj copyFromTexture:_sourceTexture sourceSlice:_sourceSlice sourceLevel:_sourceLevel sourceOrigin:_sourceOrigin sourceSize:_sourceSize
+			[m_obj copyFromTexture:_sourceTexture sourccnuleSlice:_sourceSlice sourceLevel:_sourceLevel sourceOrigin:_sourceOrigin sourceSize:_sourceSize
 						 toTexture:_destinationTexture destinationSlice:_destinationSlice destinationLevel:_destinationLevel destinationOrigin:_destinationOrigin];
 		}
 

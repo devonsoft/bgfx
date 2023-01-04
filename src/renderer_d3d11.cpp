@@ -1293,6 +1293,9 @@ namespace bgfx { namespace d3d11
 				{
 					g_caps.supported |= BGFX_CAPS_INSTANCING;
 				}
+
+// Removed for DURANGO
+#ifndef _DURANGO
 				else
 				{
 					D3D11_FEATURE_DATA_D3D9_SIMPLE_INSTANCING_SUPPORT data;
@@ -1303,6 +1306,7 @@ namespace bgfx { namespace d3d11
 						g_caps.supported |= BGFX_CAPS_INSTANCING;
 					}
 				}
+#endif
 
 				// shadow compare is optional on 9_1 through 9_3 targets
 				if (m_featureLevel <= D3D_FEATURE_LEVEL_9_3)
@@ -1318,10 +1322,12 @@ namespace bgfx { namespace d3d11
 
 				// support for SV_ViewportArrayIndex and SV_RenderTargetArrayIndex in the vertex shader is optional
 				{
+#ifndef _DURANGO
 					D3D11_FEATURE_DATA_D3D11_OPTIONS3 data;
 					HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS3, &data, sizeof(data) );
 					if (SUCCEEDED(hr)
 					&&  data.VPAndRTArrayIndexFromAnyShaderFeedingRasterizer)
+#endif
 					{
 						g_caps.supported |= BGFX_CAPS_VIEWPORT_LAYER_ARRAY;
 					}

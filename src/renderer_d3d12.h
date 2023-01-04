@@ -11,6 +11,32 @@
 #include <sal.h>
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_LINUX
 #   include <d3d12.h>
+#elif defined(_GAMING_XBOX)
+#if defined(_GAMING_XBOX_SCARLETT)
+#include <d3d12_xs.h>
+#include <d3dx12_xs.h>
+#elif defined(_GAMING_XBOX_XBOXONE)
+#include <d3d12_x.h>
+#include <d3dx12_x.h>
+#endif
+#include <wrl/client.h>
+#include <wrl/event.h>
+
+#include <gxdk.h>
+
+#include <algorithm>
+#include <atomic>
+#include <cmath>
+#include <cstdint>
+#include <exception>
+#include <memory>
+#include <stdexcept>
+
+#include <assert.h>
+#include <stdio.h>
+
+
+using Microsoft::WRL::ComPtr;
 #else
 #   if !BGFX_CONFIG_DEBUG
 #      define D3DCOMPILE_NO_DEBUG 1
@@ -40,7 +66,9 @@ extern "C++" {
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wmissing-field-initializers");
-#if BX_PLATFORM_XBOXONE
+#if defined(_GAMING_XBOX_SCARLETT)
+#include <d3d12_xs.h>
+#elif BX_PLATFORM_XBOXONE
 #	include <d3dx12_x.h>
 #else
 #	include <d3dx12.h>
@@ -389,7 +417,11 @@ namespace bgfx { namespace d3d12
 
 		TextureHandle m_texture[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 		TextureHandle m_depth;
+#ifdef _GAMING_XBOX
+		uint32_t m_swapChain;
+#else
 		Dxgi::SwapChainI* m_swapChain;
+#endif
 		void* m_nwh;
 		uint32_t m_width;
 		uint32_t m_height;

@@ -7,3 +7,5 @@ tags
 .gdb_history
 .vscode
 *.TMP
+file2.patch
+file.patch

@@ -9,6 +9,10 @@
 #if BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <d3dcommon.h>
 #	include <dxgi1_6.h>
+#elif defined(_GAMING_XBOX_SCARLETT)
+#include <d3d12_xs.h>
+#elif defined(_GAMING_XBOX)
+#include <d3d12_x.h>
 #else
 #	include <d3d11_x.h>
 #endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
